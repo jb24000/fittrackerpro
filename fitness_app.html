@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTracker Pro - Your Personal Fitness Companion</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .user-stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            min-width: 120px;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .progress-ring {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+        }
+
+        .progress-ring circle {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        .progress-ring .background {
+            stroke: #e1e5e9;
+        }
+
+        .progress-ring .progress {
+            stroke: url(#gradient);
+            stroke-dasharray: 314;
+            stroke-dashoffset: 314;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-card h4 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .food-item, .exercise-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .food-item:hover, .exercise-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .item-info h5 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .item-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .item-calories {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .barcode-scanner {
+            text-align: center;
+            padding: 20px;
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .barcode-scanner:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .recommendations {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .recommendation-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .recommendation-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .water-tracker {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .water-glasses {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .water-glass {
+            width: 30px;
+            height: 40px;
+            background: #e1e5e9;
+            border-radius: 5px 5px 15px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .water-glass.filled {
+            background: linear-gradient(to top, #4facfe, #00f2fe);
+        }
+
+        .water-glass:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .user-info {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .nav-tab {
+                min-width: auto;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-dumbbell"></i> FitTracker Pro</h1>
+            <div class="user-info">
+                <div class="user-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-user"></i> John Doe
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-target"></i> Goal: Lose Weight
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-weight"></i> 180 lbs
+                    </div>
+                </div>
+                <button class="btn" onclick="showSettings()">
+                    <i class="fas fa-cog"></i> Settings
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="showTab('dashboard')">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </div>
+            <div class="nav-tab" onclick="showTab('food')">
+                <i class="fas fa-utensils"></i> Food
+            </div>
+            <div class="nav-tab" onclick="showTab('exercise')">
+                <i class="fas fa-running"></i> Exercise
+            </div>
+            <div class="nav-tab" onclick="showTab('progress')">
+                <i class="fas fa-chart-bar"></i> Progress
+            </div>
+            <div class="nav-tab" onclick="showTab('recommendations')">
+                <i class="fas fa-lightbulb"></i> Recommendations
+            </div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <h4 id="caloriesConsumed">1,250</h4>
+                    <p>Calories Consumed</p>
+                </div>
+                <div class="stat-card">
+                    <h4 id="caloriesBurned">450</h4>
+                    <p>Calories Burned</p>
+                </div>
+                <div class="stat-card">
+                    <h4 id="stepsCount">8,432</h4>
+                    <p>Steps Today</p>
+                </div>
+                <div class="stat-card">
+                    <h4 id="waterIntake">6/8</h4>
+                    <p>Glasses of Water</p>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3><i class="fas fa-bullseye"></i> Daily Goal Progress</h3>
+                    <div style="text-align: center;">
+                        <svg class="progress-ring">
+                            <defs>
+                                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#667eea"/>
+                                    <stop offset="100%" style="stop-color:#764ba2"/>
+                                </linearGradient>
+                            </defs>
+                            <circle class="background" cx="60" cy="60" r="50"></circle>
+                            <circle class="progress" cx="60" cy="60" r="50" id="calorieProgress"></circle>
+                        </svg>
+                        <p><strong>Net Calories: 800 / 1,500</strong></p>
+                        <p>700 calories remaining</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-tint"></i> Water Intake</h3>
+                    <div class="water-tracker">
+                        <div class="water-glasses" id="waterGlasses">
+                            <!-- Water glasses will be generated by JavaScript -->
+                        </div>
+                        <button class="btn btn-success" onclick="addWater()">
+                            <i class="fas fa-plus"></i> Add Glass
+                        </button>
+                    </div>
+                    <p style="margin-top: 15px; color: #666;">Goal: 8 glasses per day</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-clock"></i> Today's Activity</h3>
+                <div id="todayActivity">
+                    <div class="food-item">
+                        <div class="item-info">
+                            <h5>Breakfast - Oatmeal with Berries</h5>
+                            <p>8:30 AM</p>
+                        </div>
+                        <div class="item-calories">320 cal</div>
+                    </div>
+                    <div class="exercise-item">
+                        <div class="item-info">
+                            <h5>Morning Run</h5>
+                            <p>7:00 AM - 30 minutes</p>
+                        </div>
+                        <div class="item-calories">-300 cal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Food Tab -->
+        <div id="food" class="tab-content">
+            <div class="card">
+                <h3><i class="fas fa-utensils"></i> Log Food</h3>
+
+                <div class="barcode-scanner" onclick="scanBarcode()">
+                    <i class="fas fa-barcode" style="font-size: 2rem; color: #667eea; margin-bottom: 10px;"></i>
+                    <p><strong>Scan Barcode</strong></p>
+                    <p style="color: #666; font-size: 0.9rem;">Tap to scan product barcode</p>
+                </div>
+
+                <form id="foodForm" onsubmit="addFood(event)">
+                    <div class="form-group">
+                        <label for="foodName">Food Name</label>
+                        <input type="text" id="foodName" placeholder="e.g., Apple, Chicken Breast" required>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="foodQuantity">Quantity</label>
+                            <input type="number" id="foodQuantity" placeholder="1" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="foodUnit">Unit</label>
+                            <select id="foodUnit" required>
+                                <option value="piece">Piece</option>
+                                <option value="cup">Cup</option>
+                                <option value="oz">Ounce</option>
+                                <option value="gram">Gram</option>
+                                <option value="serving">Serving</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mealType">Meal Type</label>
+                        <select id="mealType" required>
+                            <option value="breakfast">Breakfast</option>
+                            <option value="lunch">Lunch</option>
+                            <option value="dinner">Dinner</option>
+                            <option value="snack">Snack</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn">
+                        <i class="fas fa-plus"></i> Add Food
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-list"></i> Today's Meals</h3>
+                <div id="foodLog">
+                    <!-- Food items will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Exercise Tab -->
+        <div id="exercise" class="tab-content">
+            <div class="card">
+                <h3><i class="fas fa-running"></i> Log Exercise</h3>
+
+                <form id="exerciseForm" onsubmit="addExercise(event)">
+                    <div class="form-group">
+                        <label for="exerciseName">Exercise Name</label>
+                        <select id="exerciseName" required>
+                            <option value="">Select Exercise</option>
+                            <option value="running">Running</option>
+                            <option value="walking">Walking</option>
+                            <option value="cycling">Cycling</option>
+                            <option value="swimming">Swimming</option>
+                            <option value="weightlifting">Weight Lifting</option>
+                            <option value="yoga">Yoga</option>
+                            <option value="pilates">Pilates</option>
+                            <option value="dancing">Dancing</option>
+                            <option value="basketball">Basketball</option>
+                            <option value="tennis">Tennis</option>
+                        </select>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="exerciseDuration">Duration (minutes)</label>
+                            <input type="number" id="exerciseDuration" placeholder="30" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="exerciseIntensity">Intensity</label>
+                            <select id="exerciseIntensity" required>
+                                <option value="low">Low</option>
+                                <option value="moderate">Moderate</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn">
+                        <i class="fas fa-plus"></i> Add Exercise
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-list"></i> Today's Workouts</h3>
+                <div id="exerciseLog">
+                    <!-- Exercise items will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-shoe-prints"></i> Step Counter</h3>
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; color: #667eea; margin-bottom: 10px;">
+                        <i class="fas fa-walking"></i>
+                    </div>
+                    <h2 id="stepCounter">8,432</h2>
+                    <p>Steps Today</p>
+                    <div style="margin: 20px 0;">
+                        <div style="background: #e1e5e9; height: 10px; border-radius: 5px; overflow: hidden;">
+                            <div style="background: linear-gradient(135deg, #667eea, #764ba2); height: 100%; width: 84%; transition: width 0.3s ease;"></div>
+                        </div>
+                        <p style="margin-top: 10px; color: #666;">Goal: 10,000 steps</p>
+                    </div>
+                    <button class="btn btn-secondary" onclick="syncSteps()">
+                        <i class="fas fa-sync"></i> Sync with Device
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Tab -->
+        <div id="progress" class="tab-content">
+            <div class="card">
+                <h3><i class="fas fa-weight"></i> Weight Tracking</h3>
+
+                <form id="weightForm" onsubmit="addWeight(event)">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="currentWeight">Current Weight</label>
+                            <input type="number" id="currentWeight" placeholder="180" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="weightUnit">Unit</label>
+                            <select id="weightUnit" required>
+                                <option value="lbs">Pounds (lbs)</option>
+                                <option value="kg">Kilograms (kg)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn">
+                        <i class="fas fa-plus"></i> Log Weight
+                    </button>
+                </form>
+
+                <div id="weightChart" style="margin-top: 30px; text-align: center;">
+                    <canvas id="weightCanvas" width="400" height="200" style="max-width: 100%; border: 1px solid #e1e5e9; border-radius: 10px;"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-chart-line"></i> Weekly Summary</h3>
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <h4>-2.5 lbs</h4>
+                        <p>Weight Change</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>1,450</h4>
+                        <p>Avg Daily Calories</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>9,200</h4>
+                        <p>Avg Daily Steps</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>5</h4>
+                        <p>Workout Days</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations Tab -->
+        <div id="recommendations" class="tab-content">
+            <div class="card">
+                <h3><i class="fas fa-lightbulb"></i> Personalized Recommendations</h3>
+                <p style="margin-bottom: 20px; color: #666;">Based on your body type (Mesomorph) and weight loss goal</p>
+
+                <div class="recommendations">
+                    <h4 style="margin-bottom: 15px; color: #667eea;">
+                        <i class="fas fa-utensils"></i> Meal Recommendations
+                    </h4>
+
+                    <div class="recommendation-item">
+                        <h5>Breakfast (7:00 AM - 8:00 AM)</h5>
+                        <p><strong>Greek Yogurt with Berries and Nuts</strong></p>
+                        <p>High protein breakfast perfect for your body type. Estimated: 350 calories</p>
+                    </div>
+
+                    <div class="recommendation-item">
+                        <h5>Lunch (12:00 PM - 1:00 PM)</h5>
+                        <p><strong>Grilled Chicken Salad with Quinoa</strong></p>
+                        <p>Balanced protein and complex carbs. Estimated: 450 calories</p>
+                    </div>
+
+                    <div class="recommendation-item">
+                        <h5>Dinner (6:00 PM - 7:00 PM)</h5>
+                        <p><strong>Baked Salmon with Roasted Vegetables</strong></p>
+                        <p>Omega-3 rich dinner with fiber. Estimated: 400 calories</p>
+                    </div>
+                </div>
+
+                <div class="recommendations">
+                    <h4 style="margin-bottom: 15px; color: #667eea;">
+                        <i class="fas fa-dumbbell"></i> Exercise Recommendations
+                    </h4>
+
+                    <div class="recommendation-item">
+                        <h5>Morning Cardio (6:30 AM - 7:30 AM)</h5>
+                        <p><strong>30-minute Moderate Run</strong></p>
+                        <p>Best time for fat burning based on your metabolism. Burns ~300 calories</p>
+                    </div>
+
+                    <div class="recommendation-item">
+                        <h5>Evening Strength (5:00 PM - 6:00 PM)</h5>
+                        <p><strong>Full Body Weight Training</strong></p>
+                        <p>Optimal for muscle building and metabolism boost. Burns ~250 calories</p>
+                    </div>
+                </div>
+
+                <div class="recommendations">
+                    <h4 style="margin-bottom: 15px; color: #667eea;">
+                        <i class="fas fa-tips"></i> Daily Tips
+                    </h4>
+
+                    <div class="recommendation-item">
+                        <p><strong>💧 Hydration:</strong> Drink a glass of water before each meal to help with portion control</p>
+                    </div>
+
+                    <div class="recommendation-item">
+                        <p><strong>😴 Sleep:</strong> Aim for 7-8 hours of sleep for optimal recovery and weight management</p>
+                    </div>
+
+                    <div class="recommendation-item">
+                        <p><strong>🍽️ Timing:</strong> Try to finish eating 3 hours before bedtime for better digestion</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // App State
+        let appData = {
+            user: {
+                name: "John Doe",
+                weight: 180,
+                goal: "Lose Weight",
+                bodyType: "mesomorph",
+                dailyCalorieGoal: 1500
+            },
+            today: {
+                caloriesConsumed: 1250,
+                caloriesBurned: 450,
+                steps: 8432,
+                waterGlasses: 6,
+                foods: [
+                    { name: "Oatmeal with Berries", calories: 320, meal: "breakfast", time: "8:30 AM" },
+                    { name: "Grilled Chicken Salad", calories: 450, meal: "lunch", time: "12:30 PM" },
+                    { name: "Apple", calories: 80, meal: "snack", time: "3:00 PM" },
+                    { name: "Salmon with Vegetables", calories: 400, meal: "dinner", time: "7:00 PM" }
+                ],
+                exercises: [
+                    { name: "Morning Run", duration: 30, calories: 300, time: "7:00 AM" },
+                    { name: "Weight Training", duration: 45, calories: 150, time: "5:30 PM" }
+                ]
+            }
+        };
+
+        // Tab Navigation
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Initialize Water Glasses
+        function initWaterGlasses() {
+            const container = document.getElementById('waterGlasses');
+            container.innerHTML = '';
+
+            for (let i = 0; i < 8; i++) {
+                const glass = document.createElement('div');
+                glass.className = 'water-glass';
+                if (i < appData.today.waterGlasses) {
+                    glass.classList.add('filled');
+                }
+                glass.onclick = () => toggleWaterGlass(i);
+                container.appendChild(glass);
+            }
+        }
+
+        function toggleWaterGlass(index) {
+            appData.today.waterGlasses = index + 1;
+            initWaterGlasses();
+            updateStats();
+        }
+
+        function addWater() {
+            if (appData.today.waterGlasses < 8) {
+                appData.today.waterGlasses++;
+                initWaterGlasses();
+                updateStats();
+            }
+        }
+
+        // Food Functions
+        function addFood(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('foodName').value;
+            const quantity = parseFloat(document.getElementById('foodQuantity').value);
+            const unit = document.getElementById('foodUnit').value;
+            const meal = document.getElementById('mealType').value;
+
+            // Simulate calorie calculation (in real app, this would call an API)
+            const estimatedCalories = Math.round(quantity * getCaloriesPerUnit(name, unit));
+
+            const foodItem = {
+                name: `${name} (${quantity} ${unit})`,
+                calories: estimatedCalories,
+                meal: meal,
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            };
+
+            appData.today.foods.push(foodItem);
+            appData.today.caloriesConsumed += estimatedCalories;
+
+            updateFoodLog();
+            updateStats();
+            document.getElementById('foodForm').reset();
+        }
+
+        function getCaloriesPerUnit(foodName, unit) {
+            // Simplified calorie estimation (in real app, use food database API)
+            const calorieData = {
+                'apple': { 'piece': 80, 'cup': 65, 'gram': 0.52 },
+                'banana': { 'piece': 105, 'cup': 134, 'gram': 0.89 },
+                'chicken breast': { 'oz': 46, 'gram': 1.65, 'serving': 185 },
+                'rice': { 'cup': 205, 'gram': 1.3, 'serving': 205 },
+                'oatmeal': { 'cup': 147, 'gram': 0.68, 'serving': 147 }
+            };
+
+            const food = foodName.toLowerCase();
+            return calorieData[food]?.[unit] || 100; // Default to 100 if not found
+        }
+
+        function updateFoodLog() {
+            const container = document.getElementById('foodLog');
+            container.innerHTML = '';
+
+            appData.today.foods.forEach((food, index) => {
+                const foodElement = document.createElement('div');
+                foodElement.className = 'food-item';
+                foodElement.innerHTML = `
+                    <div class="item-info">
+                        <h5>${food.name}</h5>
+                        <p>${food.time} - ${food.meal}</p>
+                    </div>
+                    <div class="item-calories">${food.calories} cal</div>
+                `;
+                container.appendChild(foodElement);
+            });
+        }
+
+        // Exercise Functions
+        function addExercise(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('exerciseName').value;
+            const duration = parseInt(document.getElementById('exerciseDuration').value);
+            const intensity = document.getElementById('exerciseIntensity').value;
+
+            // Simulate calorie burn calculation
+            const caloriesBurned = calculateCaloriesBurned(name, duration, intensity);
+
+            const exerciseItem = {
+                name: name.charAt(0).toUpperCase() + name.slice(1),
+                duration: duration,
+                calories: caloriesBurned,
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            };
+
+            appData.today.exercises.push(exerciseItem);
+            appData.today.caloriesBurned += caloriesBurned;
+
+            updateExerciseLog();
+            updateStats();
+            document.getElementById('exerciseForm').reset();
+        }
+
+        function calculateCaloriesBurned(exercise, duration, intensity) {
+            const baseCalories = {
+                'running': 10,
+                'walking': 4,
+                'cycling': 8,
+                'swimming': 11,
+                'weightlifting': 6,
+                'yoga': 3,
+                'pilates': 4,
+                'dancing': 5,
+                'basketball': 8,
+                'tennis': 7
+            };
+
+            const intensityMultiplier = {
+                'low': 0.8,
+                'moderate': 1.0,
+                'high': 1.3
+            };
+
+            const base = baseCalories[exercise] || 5;
+            return Math.round(base * duration * intensityMultiplier[intensity]);
+        }
+
+        function updateExerciseLog() {
+            const container = document.getElementById('exerciseLog');
+            container.innerHTML = '';
+
+            appData.today.exercises.forEach(exercise => {
+                const exerciseElement = document.createElement('div');
+                exerciseElement.className = 'exercise-item';
+                exerciseElement.innerHTML = `
+                    <div class="item-info">
+                        <h5>${exercise.name}</h5>
+                        <p>${exercise.time} - ${exercise.duration} minutes</p>
+                    </div>
+                    <div class="item-calories">-${exercise.calories} cal</div>
+                `;
+                container.appendChild(exerciseElement);
+            });
+        }
+
+        // Weight Tracking
+        function addWeight(event) {
+            event.preventDefault();
+
+            const weight = parseFloat(document.getElementById('currentWeight').value);
+            const unit = document.getElementById('weightUnit').value;
+
+            appData.user.weight = weight;
+
+            // Update display
+            document.querySelector('.stat-item:nth-child(3)').innerHTML = `
+                <i class="fas fa-weight"></i> ${weight} ${unit}
+            `;
+
+            alert(`Weight logged: ${weight} ${unit}`);
+            document.getElementById('weightForm').reset();
+        }
+
+        // Update Statistics
+        function updateStats() {
+            document.getElementById('caloriesConsumed').textContent = appData.today.caloriesConsumed.toLocaleString();
+            document.getElementById('caloriesBurned').textContent = appData.today.caloriesBurned.toLocaleString();
+            document.getElementById('stepsCount').textContent = appData.today.steps.toLocaleString();
+            document.getElementById('waterIntake').textContent = `${appData.today.waterGlasses}/8`;
+
+            // Update progress ring
+            const netCalories = appData.today.caloriesConsumed - appData.today.caloriesBurned;
+            const progress = Math.min(netCalories / appData.user.dailyCalorieGoal, 1);
+            const circumference = 2 * Math.PI * 50;
+            const offset = circumference - (progress * circumference);
+
+            document.getElementById('calorieProgress').style.strokeDashoffset = offset;
+        }
+
+        // Utility Functions
+        function scanBarcode() {
+            alert('Barcode scanner would open here. In a real app, this would use the device camera to scan product barcodes.');
+        }
+
+        function syncSteps() {
+            alert('Syncing with fitness devices... In a real app, this would connect to Google Fit, Apple Health, Fitbit, etc.');
+            // Simulate step update
+            appData.today.steps += Math.floor(Math.random() * 500);
+            document.getElementById('stepCounter').textContent = appData.today.steps.toLocaleString();
+            updateStats();
+        }
+
+        function showSettings() {
+            alert('Settings panel would open here. Users could update their profile, goals, body type, and sync preferences.');
+        }
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', function() {
+            initWaterGlasses();
+            updateFoodLog();
+            updateExerciseLog();
+            updateStats();
+        });
+    </script>
+</body>
+</html>
